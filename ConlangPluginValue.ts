@@ -29,21 +29,24 @@ class ConlangPlugin implements PluginValue {
     const decorations: Range<Decoration>[] = [];
 
     console.log("hflisl;l")
-    console.log(view)
 
     // For every valid parser ⟨ ⟩ pair (starting at 'start' and stopping at 'end', adda  decoration)
-    for (let { from, to } of view.visibleRanges) {
-      syntaxTree(view.state).iterate({
-        from,
-        to,
-        enter(nodeRef) {
-          console.log("fjdsi")
-          console.log(nodeRef)
-          decorations.push(Decoration.mark({class: "conlang"}).range(start, end))
-        },
-      });
-    }
 
+    for (let {from, to} of view.visibleRanges) {
+      syntaxTree(view.state).iterate({
+        from, to,
+        enter: (node) => {
+          let first = view.state.doc.sliceString(node.from, node.to).indexOf("⟨");
+          let second = view.state.doc.sliceString(node.from, node.to).indexOf("⟩");
+          console.log(`one: ${first} two: ${second}`)
+          if (first>=0 && second>=0) {
+            decorations.push(Decoration.mark({class: "myconlang"}).range(first, second))
+            console.log(decorations)
+          }
+          console.log("uriopweu")
+        }
+      })
+    }
 
     return Decoration.set(decorations, true);
   }
