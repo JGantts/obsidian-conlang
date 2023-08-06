@@ -39,9 +39,10 @@ class ConlangPlugin implements PluginValue {
           //////////////////////////////////////////////
           //This currently only finds the first result//
           //////////////////////////////////////////////
-          let first = view.state.doc.sliceString(node.from, node.to).indexOf("⟨");
-          let second = view.state.doc.sliceString(node.from, node.to).indexOf("⟩");
-          console.log(`one: ${first} two: ${second}`)
+          let current = view.state.doc.sliceString(node.from, node.to)
+          let first = current.indexOf("⟨");
+          let second = current.indexOf("⟩");
+          console.log(`one: ${first} two: ${second} contents: ${current.substring(first, second)}`)
           if (first>=0 && second>=0) {
             decorations.push(Decoration.mark({class: "myconlang"}).range(first, second))
             console.log(decorations)
