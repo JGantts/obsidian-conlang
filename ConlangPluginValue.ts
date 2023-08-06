@@ -36,6 +36,9 @@ class ConlangPlugin implements PluginValue {
       syntaxTree(view.state).iterate({
         from, to,
         enter: (node) => {
+          //////////////////////////////////////////////
+          //This currently only finds the first result//
+          //////////////////////////////////////////////
           let first = view.state.doc.sliceString(node.from, node.to).indexOf("⟨");
           let second = view.state.doc.sliceString(node.from, node.to).indexOf("⟩");
           console.log(`one: ${first} two: ${second}`)
