@@ -35,23 +35,26 @@ class ConlangPlugin implements PluginValue {
     //decorations.push(Decoration.mark({class: "myconlang"}).range(0, 8))
     // For every valid parser ⟨ ⟩ pair (starting at 'start' and stopping at 'end', adda  decoration)
 
-    for (let {from, to} of view.visibleRanges) {
+    for (let { from, to } of view.visibleRanges) {
       syntaxTree(view.state).iterate({
         from, to,
         enter: (node) => {
           let current = view.state.doc.sliceString(node.from, node.to)
+          //console.log(current)
           let first = current.indexOf("⟨");
-          let second = current.indexOf("⟩");
-          if (first>=0 && second>=0) {
-            //console.log(current)
-            //console.log(`f2s first: ${first} second: ${second}`);
-            let rangeFrom = first
-            let rangeTo = second
-            //console.log(`fhilhs from: ${rangeFrom} to: ${rangeTo}`);
-            decorations.push(this.dec.range(rangeFrom, rangeTo))
+          let second = current.indexOf("⟩", first);
+          while (first >= 0 && second >= 0) {
+            let rangeFrom = node.from + first;
+            let rangeTo = node.from + second + 1;
+            console.log(`${rangeFrom} ${rangeTo}`)
+            decorations.push(
+              this.dec.range(rangeFrom, rangeTo)
+            );
+            first = current.indexOf("⟨", second);
+            second = current.indexOf("⟩", first);
           }
-        }
-      })
+        },
+      });
     }
 
     //console.log(decorations)
