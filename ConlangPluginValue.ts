@@ -17,6 +17,9 @@ class ConlangPlugin implements PluginValue {
 
   constructor(view: EditorView) {
     this.decorations = this.buildDecorations(view);
+    /*this.decorations = Decoration.set([
+      Decoration.mark({class: "myconlang"}).range(0, 12)
+    ], true)*/
   }
 
   update(update: ViewUpdate) {
@@ -26,7 +29,8 @@ class ConlangPlugin implements PluginValue {
   }
 
   buildDecorations(view: EditorView): DecorationSet {
-    const decorations: Range<Decoration>[] = [];
+    const builder = new RangeSetBuilder<Decoration>();
+    //const decorations: Range<Decoration>[] = [];
 
     console.log("hflisl;l")
 
@@ -42,17 +46,18 @@ class ConlangPlugin implements PluginValue {
           let current = view.state.doc.sliceString(node.from, node.to)
           let first = current.indexOf("⟨");
           let second = current.indexOf("⟩");
-          console.log(`one: ${first} two: ${second} contents: ${current.substring(first, second)}`)
+          console.log(`from: ${node.from} to: ${node.to} current: ${current} one: ${first} two: ${second} contents: ${current.substring(first, second+1)}`)
           if (first>=0 && second>=0) {
-            decorations.push(Decoration.mark({class: "myconlang"}).range(first, second))
-            console.log(decorations)
+            console.log(`range: ${node.from + first} thru ${node.from + second}`)
+            //builder.add(node.from + first, node.from + second, Decoration.mark({class: "myconlang"}))
+            builder.add(node.from + first, node.from + second, Decoration.mark({class: "myconlang"}))
           }
           console.log("uriopweu")
         }
       })
     }
-
-    return Decoration.set(decorations, true);
+  
+    return builder.finish();
   }
 }
 
