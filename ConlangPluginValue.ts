@@ -30,15 +30,7 @@ class ConlangPlugin implements PluginValue {
 
   buildDecorations(view: EditorView): DecorationSet {
     const decorations: Range<Decoration>[] = [];
-    decorations.push(Decoration.mark({class: "myconlang"}).range(0, 8))
-    return Decoration.set(decorations, true);
-
-    //const builder = new RangeSetBuilder<Decoration>();
-    //builder.add(0, 7, Decoration.mark({class: "myconlang"}))
-    //return builder.finish();
-  }
-  /*
-
+    //decorations.push(Decoration.mark({class: "myconlang"}).range(0, 8))
     // For every valid parser ⟨ ⟩ pair (starting at 'start' and stopping at 'end', adda  decoration)
 
     for (let {from, to} of view.visibleRanges) {
@@ -48,17 +40,21 @@ class ConlangPlugin implements PluginValue {
           let current = view.state.doc.sliceString(node.from, node.to)
           let first = current.indexOf("⟨");
           let second = current.indexOf("⟩");
-          console.log(`from: ${node.from} to: ${node.to} current: ${current} one: ${first} two: ${second} contents: ${current.substring(first, second+1)}`)
           if (first>=0 && second>=0) {
-            decorations.push(Decoration.mark({class: "myconlang"}).range(node.from + first, node.from + second))
+            //console.log(current)
+            //console.log(`f2s first: ${first} second: ${second}`);
+            let rangeFrom = first
+            let rangeTo = second
+            //console.log(`fhilhs from: ${rangeFrom} to: ${rangeTo}`);
+            decorations.push(Decoration.mark({class: "myconlang"}).range(0, 16))
           }
         }
       })
     }
 
-    console.log(decorations)
+    //console.log(decorations)
     return Decoration.set(decorations, true);
-  }*/
+  }
 }
 
 const conlangPluginSpec: PluginSpec<ConlangPlugin> = {
