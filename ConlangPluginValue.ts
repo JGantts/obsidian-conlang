@@ -28,6 +28,8 @@ class ConlangPlugin implements PluginValue {
     //}
   }
 
+  dec = Decoration.mark({class: "myconlang"})
+
   buildDecorations(view: EditorView): DecorationSet {
     const decorations: Range<Decoration>[] = [];
     //decorations.push(Decoration.mark({class: "myconlang"}).range(0, 8))
@@ -46,7 +48,7 @@ class ConlangPlugin implements PluginValue {
             let rangeFrom = first
             let rangeTo = second
             //console.log(`fhilhs from: ${rangeFrom} to: ${rangeTo}`);
-            decorations.push(Decoration.mark({class: "myconlang"}).range(0, 16))
+            decorations.push(this.dec.range(rangeFrom, rangeTo))
           }
         }
       })
