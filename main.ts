@@ -3,97 +3,14 @@ import { App, Editor, MarkdownPostProcessorContext, MarkdownRenderChild, Markdow
 
 // Remember to rename these classes and interfaces!
 
+const VERSION_STRING = "v0.1.2"
+
 interface MyPluginSettings {
 	mySetting: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	mySetting: 'default'
-}
-
-function checkNode(element: Element, context: MarkdownPostProcessorContext) {
-  if (
-    element.classList
-    && element.classList.contains("jgantts_err")
-  ) {
-    console.log("err-vevesc: element")
-    console.log(element)
-    return
-  }
-  //@ts-expect-error
-  let innerT = element.innerText ?? element.textContent
-  //console.log(innerT)
-  //console.log(element.innerHTML)
-  if (
-    !element.innerHTML
-    || innerT == element.innerHTML
-  ) {
-    const text = innerT
-    if (text) {
-      let first = text.indexOf("⟨");
-      let second = text.indexOf("⟩", first);
-      let pairs: {start: number, end: number}[] = []
-      while ((first!=-1 || second!=-1) && first < text.length) {
-        let start =
-          (first!=-1)
-            ? first
-            : 0
-        let end =
-          (second!=-1)
-            ? second
-            : text.length - 1
-        pairs.push({start, end})
-        first = text.indexOf("⟨", first+1);
-        second = 
-          first!=-1
-            ? text.indexOf("⟩", first+1)
-            : -1
-      }
-      if (pairs.length > 0) {
-        let htmlElement = element as HTMLElement
-        if (htmlElement) {
-          //console.log("jfsdhlk")
-          //console.log(htmlElement)
-          if (htmlElement.nodeType == 3) {
-            let parent = htmlElement.parentElement
-            if (parent) {
-              context.addChild(new Replacement(parent, pairs, htmlElement))
-            } else {
-              console.log("err-dsagf: element")
-              console.log(element)
-            }
-          } else {
-            context.addChild(new Replacement(htmlElement, pairs, htmlElement))
-          }
-        } else {
-          console.log("err-tewrt: element")
-          console.log(element)
-        }
-      }
-    }
-  } else {
-    const divs = element.childNodes;
-    /*console.log("querySelectorAll")
-    divs.forEach((div) => {
-      console.log(div)
-    })
-    console.log("childNodes")
-    element.childNodes.forEach((div) => {
-      console.log(div)
-    })
-    console.log("children")
-    for (let index = 0; index < element.children.length; index++) {
-      const curr = element.children.item(index);
-      console.log(curr)
-    }*/
-    for (let index = 0; index < divs.length; index++) {
-      const curr = divs.item(index) as Element;
-      if (curr) {
-        //console.log(curr)
-        checkNode(curr, context)
-      }
-    }
-  }
 }
 
 export default class MyPlugin extends Plugin {
@@ -103,22 +20,42 @@ export default class MyPlugin extends Plugin {
 		await this.loadSettings();
 
     this.registerMarkdownPostProcessor((element: HTMLElement, context: MarkdownPostProcessorContext) => {
-      checkNode(element, context)
-    });
-    this.registerEditorExtension(conlangPlugin)
+      checkNode(element, context, {
+        open: "⟨",
+        close: "⟩",
+        class: "myconlang"
+      })
+    })
+    this.registerMarkdownPostProcessor((element: HTMLElement, context: MarkdownPostProcessorContext) => {
+      checkNode(element, context, {
+        open: "/",
+        close: "/",
+        class: "myipalang"
+      })
+    })
+    this.registerEditorExtension(conlangPlugin({
+      open: "⟨",
+      close: "⟩",
+      class: "myconlang"
+    }))
+    /*this.registerEditorExtension(conlangPlugin({
+      open: "/",
+      close: "/",
+      class: "myipalang"
+    }))*/
 
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+			new Notice(`conlang ${VERSION_STRING}`);
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('conlang v0.1.0');
+		statusBarItemEl.setText(`conlang ${VERSION_STRING}`);
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
@@ -214,7 +151,7 @@ class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Setting #1')
-			.setDesc('It\'s a secret')
+			.setDesc(`conlang ${VERSION_STRING}`)
 			.addText(text => text
 				.setPlaceholder('Enter your secret')
 				.setValue(this.plugin.settings.mySetting)
@@ -222,21 +159,105 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.mySetting = value;
 					await this.plugin.saveSettings();
 				}));
+    
+
 	}
 }
 
-function addPostMarkdownStuff() {
-
+function checkNode(
+  element: Element,
+  context: MarkdownPostProcessorContext,
+  langSettings: {
+    open: string,
+    close: string,
+    class: string,
+  }
+) {
+  if (
+    element.classList
+    && element.classList.contains("jgantts_err")
+  ) {
+    console.log("err-vevesc: element")
+    console.log(element)
+    return
+  }
+  //@ts-expect-error
+  let innerT = element.innerText ?? element.textContent
+  if (
+    !element.innerHTML
+    || innerT == element.innerHTML
+  ) {
+    const text = innerT
+    if (text) {
+      let first = text.indexOf(langSettings.open);
+      let second = text.indexOf(langSettings.close, first+1);
+      let pairs: {start: number, end: number}[] = []
+      while ((first!=-1 || second!=-1) && first < text.length) {
+        let start =
+          (first!=-1)
+            ? first
+            : 0
+        let end =
+          (second!=-1)
+            ? second
+            : text.length - 1
+        pairs.push({start, end})
+        first = text.indexOf(langSettings.open, first+1);
+        second = 
+          first!=-1
+            ? text.indexOf(langSettings.close, first+1)
+            : -1
+      }
+      if (pairs.length > 0) {
+        let htmlElement = element as HTMLElement
+        if (htmlElement) {
+          if (htmlElement.nodeType == 3) {
+            let parent = htmlElement.parentElement
+            if (parent) {
+              context.addChild(new Replacement(parent, pairs, htmlElement, langSettings))
+            } else {
+              console.log("err-dsagf: element")
+              console.log(element)
+            }
+          } else {
+            context.addChild(new Replacement(htmlElement, pairs, htmlElement, langSettings))
+          }
+        } else {
+          console.log("err-tewrt: element")
+          console.log(element)
+        }
+      }
+    }
+  } else {
+    const divs = element.childNodes;
+    for (let index = 0; index < divs.length; index++) {
+      const curr = divs.item(index) as Element;
+      if (curr) {
+        checkNode(curr, context, langSettings)
+      }
+    }
+  }
 }
 
 class Replacement extends MarkdownRenderChild {
   pairs: { start: number; end: number; }[];
   replacementEl: Element;
+  langSettings: { open: string; close: string; class: string; };
 
-  constructor(containerEl: HTMLElement, pairs: {start: number, end: number}[], replacementEl: Element) {
+  constructor(
+    containerEl: HTMLElement,
+    pairs: {start: number, end: number}[],
+    replacementEl: Element,
+    langSettings: {
+      open: string,
+      close: string,
+      class: string,
+    }
+  ) {
     super(containerEl);
     this.pairs = pairs;
     this.replacementEl = replacementEl
+    this.langSettings = langSettings
   }
 
   onload() {
@@ -261,7 +282,7 @@ class Replacement extends MarkdownRenderChild {
       if (currentPair.start > lastIndex) {
         addNewDiv(text.substring(lastIndex, currentPair.start))
       }
-      addNewDiv(text.substring(currentPair.start, currentPair.end+1), "myconlang")
+      addNewDiv(text.substring(currentPair.start, currentPair.end+1), this.langSettings.class)
       lastIndex = currentPair.end+1
       index++
     }
