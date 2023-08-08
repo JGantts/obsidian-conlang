@@ -33,16 +33,21 @@ function checkNode(element: Element, context: MarkdownPostProcessorContext) {
       let first = text.indexOf("⟨");
       let second = text.indexOf("⟩", first);
       let pairs: {start: number, end: number}[] = []
-      while (first != -1 && first < text.length) {
-        let end: number
-        if (second==-1) {
-          end = text.length - 1
-        } else {
-          end = second
-        }
-        pairs.push({start: first, end})
+      while ((first!=-1 || second!=-1) && first < text.length) {
+        let start =
+          (first!=-1)
+            ? first
+            : 0
+        let end =
+          (second!=-1)
+            ? second
+            : text.length - 1
+        pairs.push({start, end})
         first = text.indexOf("⟨", first+1);
-        second = text.indexOf("⟩", first+1);
+        second = 
+          first!=-1
+            ? text.indexOf("⟩", first+1)
+            : -1
       }
       if (pairs.length > 0) {
         let htmlElement = element as HTMLElement

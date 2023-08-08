@@ -43,15 +43,26 @@ class ConlangPlugin implements PluginValue {
           //console.log(current)
           let first = current.indexOf("⟨");
           let second = current.indexOf("⟩", first);
-          while (first >= 0 && second >= 0) {
-            let rangeFrom = node.from + first;
-            let rangeTo = node.from + second + 1;
+          while (second >= 0) {
+            let start =
+              (first!=-1)
+                ? first
+                : 0
+            let end =
+              (second!=-1)
+                ? second
+                : current.length - 1
+            let rangeFrom = node.from + start;
+            let rangeTo = node.from + end + 1;
             //console.log(`${rangeFrom} ${rangeTo}`)
             decorations.push(
               this.dec.range(rangeFrom, rangeTo)
             );
             first = current.indexOf("⟨", second);
-            second = current.indexOf("⟩", first);
+            second = 
+              first!=-1
+                ? current.indexOf("⟩", first)
+                : -1
           }
         },
       });
