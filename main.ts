@@ -12,26 +12,22 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 }
 
 function checkNode(element: Element, context: MarkdownPostProcessorContext) {
-  console.log(element.classList)
   if (element.classList.contains("jgantts_err")) {
     console.log("EEEEEEERRRRRRR")
     return
   }
   //@ts-expect-error
   let innerT = element.innerText 
+  console.log(innerT)
+  console.log(element.innerHTML)
   if (innerT && (innerT == element.innerHTML)) {
-    console.log("fsd")
-    console.log(innerT)
     let htmlElement = element as HTMLElement
     const text = htmlElement.innerText;
     if (text) {
-      console.log("rwe")
       let first = text.indexOf("⟨");
       let second = text.indexOf("⟩", first);
       let pairs: {start: number, end: number}[] = []
       while (first != -1 && first < text.length) {
-        console.log("bcxv")
-        console.log(text)
         let end: number
         if (second==-1) {
           end = text.length - 1
@@ -41,22 +37,29 @@ function checkNode(element: Element, context: MarkdownPostProcessorContext) {
         pairs.push({start: first, end})
         first = text.indexOf("⟨", first+1);
         second = text.indexOf("⟩", first+1);
-        console.log(`hi ${first} ${second}`)
       }
-      console.log(JSON.stringify(pairs))
       if (pairs.length > 0) {
         context.addChild(new Replacement(htmlElement, pairs))
       }
     }
   } else {
     const divs = element.querySelectorAll("*");
+    /*console.log("querySelectorAll")
+    divs.forEach((div) => {
+      console.log(div)
+    })
+    console.log("childNodes")
+    element.childNodes.forEach((div) => {
+      console.log(div)
+    })
+    console.log("children")
+    for (let index = 0; index < element.children.length; index++) {
+      const curr = element.children.item(index);
+      console.log(curr)
+    }*/
     for (let index = 0; index < divs.length; index++) {
       const curr = divs.item(index);
-      console.log("cftguyihojpk")
-      console.log(curr.innerHTML)
-      if (curr.innerHTML) {
-        checkNode(curr, context)
-      }
+      checkNode(curr, context)
     }
   }
 }
@@ -205,7 +208,6 @@ class Replacement extends MarkdownRenderChild {
   onload() {
     let containerDiv = this.containerEl.createDiv()
     function addNewDiv(inner: string, theClass: string|null = null) {
-      console.log("new span: "+inner)
       let newSpan = containerDiv.createSpan({
         text: inner,
       })
@@ -218,10 +220,8 @@ class Replacement extends MarkdownRenderChild {
     let text = this.containerEl.innerText
     let lastIndex = 0
     let index = 0
-    console.log(text)
     while (index <= this.pairs.length-1 && lastIndex < text.length-1) {
       let currentPair = this.pairs[index]
-      console.log(`arg: ${currentPair.start} ${lastIndex}`)
       if (currentPair.start > lastIndex) {
         addNewDiv(text.substring(lastIndex, currentPair.start))
       }
