@@ -12,17 +12,23 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 }
 
 function checkNode(element: Element, context: MarkdownPostProcessorContext) {
-  if (element.classList.contains("jgantts_err")) {
-    console.log("EEEEEEERRRRRRR")
+  if (
+    element.classList
+    && element.classList.contains("jgantts_err")
+  ) {
+    console.log("err-vevesc: element")
+    console.log(element)
     return
   }
   //@ts-expect-error
-  let innerT = element.innerText 
-  console.log(innerT)
-  console.log(element.innerHTML)
-  if (innerT && (innerT == element.innerHTML)) {
-    let htmlElement = element as HTMLElement
-    const text = htmlElement.innerText;
+  let innerT = element.innerText ?? element.textContent
+  //console.log(innerT)
+  //console.log(element.innerHTML)
+  if (
+    !element.innerHTML
+    || innerT == element.innerHTML
+  ) {
+    const text = innerT
     if (text) {
       let first = text.indexOf("⟨");
       let second = text.indexOf("⟩", first);
@@ -39,11 +45,29 @@ function checkNode(element: Element, context: MarkdownPostProcessorContext) {
         second = text.indexOf("⟩", first+1);
       }
       if (pairs.length > 0) {
-        context.addChild(new Replacement(htmlElement, pairs))
+        let htmlElement = element as HTMLElement
+        if (htmlElement) {
+          //console.log("jfsdhlk")
+          //console.log(htmlElement)
+          if (htmlElement.nodeType == 3) {
+            let parent = htmlElement.parentElement
+            if (parent) {
+              context.addChild(new Replacement(parent, pairs, htmlElement))
+            } else {
+              console.log("err-dsagf: element")
+              console.log(element)
+            }
+          } else {
+            context.addChild(new Replacement(htmlElement, pairs, htmlElement))
+          }
+        } else {
+          console.log("err-tewrt: element")
+          console.log(element)
+        }
       }
     }
   } else {
-    const divs = element.querySelectorAll("*");
+    const divs = element.childNodes;
     /*console.log("querySelectorAll")
     divs.forEach((div) => {
       console.log(div)
@@ -58,8 +82,11 @@ function checkNode(element: Element, context: MarkdownPostProcessorContext) {
       console.log(curr)
     }*/
     for (let index = 0; index < divs.length; index++) {
-      const curr = divs.item(index);
-      checkNode(curr, context)
+      const curr = divs.item(index) as Element;
+      if (curr) {
+        //console.log(curr)
+        checkNode(curr, context)
+      }
     }
   }
 }
@@ -86,7 +113,7 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
+		statusBarItemEl.setText('conlang v0.1.0');
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
@@ -199,14 +226,18 @@ function addPostMarkdownStuff() {
 
 class Replacement extends MarkdownRenderChild {
   pairs: { start: number; end: number; }[];
+  replacementEl: Element;
 
-  constructor(containerEl: HTMLElement, pairs: {start: number, end: number}[]) {
+  constructor(containerEl: HTMLElement, pairs: {start: number, end: number}[], replacementEl: Element) {
     super(containerEl);
     this.pairs = pairs;
+    this.replacementEl = replacementEl
   }
 
   onload() {
-    let containerDiv = this.containerEl.createDiv()
+    //console.log(this.containerEl)
+    //console.log(this.containerEl.nodeType)
+    let containerDiv = this.containerEl.createSpan()
     function addNewDiv(inner: string, theClass: string|null = null) {
       let newSpan = containerDiv.createSpan({
         text: inner,
@@ -217,7 +248,7 @@ class Replacement extends MarkdownRenderChild {
       newSpan.classList.add("jgantts_err")
       containerDiv.appendChild(newSpan)
     }
-    let text = this.containerEl.innerText
+    let text = this.replacementEl.textContent ?? ""
     let lastIndex = 0
     let index = 0
     while (index <= this.pairs.length-1 && lastIndex < text.length-1) {
@@ -232,6 +263,10 @@ class Replacement extends MarkdownRenderChild {
     if (lastIndex < text.length) {
       addNewDiv(text.substring(lastIndex, text.length))
     }
-    this.containerEl.replaceChildren(containerDiv);
+    if (this.containerEl == this.replacementEl) {
+      this.containerEl.replaceChildren(containerDiv)
+    } else {
+      this.containerEl.replaceChild(containerDiv, this.replacementEl)
+    }
   }
 }
