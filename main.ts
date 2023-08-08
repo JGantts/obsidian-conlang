@@ -1,5 +1,5 @@
 import { conlangPlugin } from 'ConlangPluginValue';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
@@ -11,12 +11,65 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	mySetting: 'default'
 }
 
+function checkNode(element: Element, context: MarkdownPostProcessorContext) {
+  console.log(element.classList)
+  if (element.classList.contains("jgantts_err")) {
+    console.log("EEEEEEERRRRRRR")
+    return
+  }
+  //@ts-expect-error
+  let innerT = element.innerText 
+  if (innerT && (innerT == element.innerHTML)) {
+    console.log("fsd")
+    console.log(innerT)
+    let htmlElement = element as HTMLElement
+    const text = htmlElement.innerText;
+    if (text) {
+      console.log("rwe")
+      let first = text.indexOf("⟨");
+      let second = text.indexOf("⟩", first);
+      let pairs: {start: number, end: number}[] = []
+      while (first != -1 && first < text.length) {
+        console.log("bcxv")
+        console.log(text)
+        let end: number
+        if (second==-1) {
+          end = text.length - 1
+        } else {
+          end = second
+        }
+        pairs.push({start: first, end})
+        first = text.indexOf("⟨", first+1);
+        second = text.indexOf("⟩", first+1);
+        console.log(`hi ${first} ${second}`)
+      }
+      console.log(JSON.stringify(pairs))
+      if (pairs.length > 0) {
+        context.addChild(new Replacement(htmlElement, pairs))
+      }
+    }
+  } else {
+    const divs = element.querySelectorAll("*");
+    for (let index = 0; index < divs.length; index++) {
+      const curr = divs.item(index);
+      console.log("cftguyihojpk")
+      console.log(curr.innerHTML)
+      if (curr.innerHTML) {
+        checkNode(curr, context)
+      }
+    }
+  }
+}
+
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
 
+    this.registerMarkdownPostProcessor((element: HTMLElement, context: MarkdownPostProcessorContext) => {
+      checkNode(element, context)
+    });
     this.registerEditorExtension(conlangPlugin)
 
 
@@ -135,4 +188,50 @@ class SampleSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 	}
+}
+
+function addPostMarkdownStuff() {
+
+}
+
+class Replacement extends MarkdownRenderChild {
+  pairs: { start: number; end: number; }[];
+
+  constructor(containerEl: HTMLElement, pairs: {start: number, end: number}[]) {
+    super(containerEl);
+    this.pairs = pairs;
+  }
+
+  onload() {
+    let containerDiv = this.containerEl.createDiv()
+    function addNewDiv(inner: string, theClass: string|null = null) {
+      console.log("new span: "+inner)
+      let newSpan = containerDiv.createSpan({
+        text: inner,
+      })
+      if (theClass) {
+        newSpan.classList.add(theClass)
+      }
+      newSpan.classList.add("jgantts_err")
+      containerDiv.appendChild(newSpan)
+    }
+    let text = this.containerEl.innerText
+    let lastIndex = 0
+    let index = 0
+    console.log(text)
+    while (index <= this.pairs.length-1 && lastIndex < text.length-1) {
+      let currentPair = this.pairs[index]
+      console.log(`arg: ${currentPair.start} ${lastIndex}`)
+      if (currentPair.start > lastIndex) {
+        addNewDiv(text.substring(lastIndex, currentPair.start))
+      }
+      addNewDiv(text.substring(currentPair.start, currentPair.end+1), "myconlang")
+      lastIndex = currentPair.end+1
+      index++
+    }
+    if (lastIndex < text.length) {
+      addNewDiv(text.substring(lastIndex, text.length))
+    }
+    this.containerEl.replaceChildren(containerDiv);
+  }
 }

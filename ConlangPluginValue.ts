@@ -46,7 +46,7 @@ class ConlangPlugin implements PluginValue {
           while (first >= 0 && second >= 0) {
             let rangeFrom = node.from + first;
             let rangeTo = node.from + second + 1;
-            console.log(`${rangeFrom} ${rangeTo}`)
+            //console.log(`${rangeFrom} ${rangeTo}`)
             decorations.push(
               this.dec.range(rangeFrom, rangeTo)
             );
