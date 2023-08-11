@@ -1,9 +1,10 @@
 import { conlangPlugin } from 'ConlangPluginValue';
 import { App, Editor, MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import checker from "checker"
 
 // Remember to rename these classes and interfaces!
 
-const VERSION_STRING = "v0.1.2"
+const VERSION_STRING = "v0.1.4"
 
 interface MyPluginSettings {
 	mySetting: string;
@@ -28,6 +29,13 @@ export default class MyPlugin extends Plugin {
     })
     this.registerMarkdownPostProcessor((element: HTMLElement, context: MarkdownPostProcessorContext) => {
       checkNode(element, context, {
+        open: "[",
+        close: "]",
+        class: "myipalang"
+      })
+    })
+    this.registerMarkdownPostProcessor((element: HTMLElement, context: MarkdownPostProcessorContext) => {
+      checkNode(element, context, {
         open: "/",
         close: "/",
         class: "myipalang"
@@ -37,6 +45,11 @@ export default class MyPlugin extends Plugin {
       open: "⟨",
       close: "⟩",
       class: "myconlang"
+    }))
+    this.registerEditorExtension(conlangPlugin({
+      open: "[",
+      close: "]",
+      class: "myipalang"
     }))
     /*this.registerEditorExtension(conlangPlugin({
       open: "/",
@@ -188,30 +201,24 @@ function checkNode(
     || innerT == element.innerHTML
   ) {
     const text = innerT
+    let pairs: {start: number, end: number}[] = []
     if (text) {
-      let first = text.indexOf(langSettings.open);
-      let second = text.indexOf(langSettings.close, first+1);
-      let pairs: {start: number, end: number}[] = []
-      while ((first!=-1 || second!=-1) && first < text.length) {
-        let start =
-          (first!=-1)
-            ? first
-            : 0
-        let end =
-          (second!=-1)
-            ? second
-            : text.length - 1
-        pairs.push({start, end})
-        first = text.indexOf(langSettings.open, first+1);
-        second = 
-          first!=-1
-            ? text.indexOf(langSettings.close, first+1)
-            : -1
-      }
+      checker.check(
+        text,
+        langSettings,
+        "\n",
+        (
+          start: number,
+          end: number
+        ) => {
+          pairs.push({start, end})
+        }
+      )
       if (pairs.length > 0) {
         let htmlElement = element as HTMLElement
         if (htmlElement) {
           if (htmlElement.nodeType == 3) {
+            // we're text
             let parent = htmlElement.parentElement
             if (parent) {
               context.addChild(new Replacement(parent, pairs, htmlElement, langSettings))
