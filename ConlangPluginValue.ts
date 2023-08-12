@@ -41,6 +41,7 @@ export const conlangPlugin =
             from, to,
             enter: (node) => {
               let current = view.state.doc.sliceString(node.from, node.to)
+              console.log("EditorExtension A")
               checker.check(
                 current,
                 langSettings,
@@ -49,6 +50,7 @@ export const conlangPlugin =
                   foundStart: number,
                   foundEnd: number
                 ) => {
+                  console.log("EditorExtension B")
                   let rangeFrom = node.from + foundStart;
                   let rangeTo = node.from + foundEnd + 1;
                   //console.log(`${rangeFrom} ${rangeTo}`)

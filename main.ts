@@ -55,11 +55,11 @@ export default class MyPlugin extends Plugin {
       close: "]",
       class: "myipalang"
     }))
-    /*this.registerEditorExtension(conlangPlugin({
+    this.registerEditorExtension(conlangPlugin({
       open: "/",
       close: "/",
       class: "myipalang"
-    }))*/
+    }))
 
 
 		// This creates an icon in the left ribbon.
@@ -207,6 +207,7 @@ function checkNode(
     const text = innerT
     let pairs: {start: number, end: number}[] = []
     if (text) {
+      console.log("MarkdownPostProcessor A")
       checker.check(
         text,
         langSettings,
@@ -215,6 +216,7 @@ function checkNode(
           start: number,
           end: number
         ) => {
+          console.log("MarkdownPostProcessor B")
           pairs.push({start, end})
         }
       )
