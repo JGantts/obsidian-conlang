@@ -207,7 +207,7 @@ function checkNode(
     const text = innerT
     let pairs: {start: number, end: number}[] = []
     if (text) {
-      console.log("MarkdownPostProcessor A")
+      //console.log("MarkdownPostProcessor A")
       checker.check(
         text,
         langSettings,
@@ -216,7 +216,7 @@ function checkNode(
           start: number,
           end: number
         ) => {
-          console.log("MarkdownPostProcessor B")
+          //console.log("MarkdownPostProcessor B")
           pairs.push({start, end})
         }
       )
