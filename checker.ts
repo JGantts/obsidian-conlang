@@ -2,66 +2,106 @@ export default {
   check(
     text: string,
     langSettings: { open: string; close: string; class: string; },
-    linebreak: string|null,
-    foundFunction: (
+    linebreak: string,
+    foundFunctionIn: (
       foundStart: number,
       foundEnd: number
     ) => void
   ) {
-    //console.log(text)
-    let first = getNextOpenAfter_orNegOne(text, langSettings, -1)
-    let second = getNextCloseAfter_orEnd(text, langSettings, first)
-    while (second >= 0) {
-      console.log(`first-second: ${first} ${text.substring(first, second+1)} ${second}`)
-      let nextFirst = getNextOpenAfter_orNegOne(text, langSettings, first)
-      if (nextFirst > -1 && nextFirst < second) {
-        //nested
-        //we don't support nesting
-          console.log(`first-nextFirst: ${first} ${text.substring(first, nextFirst+1)} ${nextFirst}`)
-        first = nextFirst
-        second = getNextCloseAfter_orEnd(text, langSettings, first)
-      } else {
-        let start =
-          (first!=-1)
-            ? first
-            : 0
-        let end =
-          (second!=-1)
-            ? second
-            : text.length - 1
-        let isBroken = 
-          linebreak
-            ? text.substring(start, end).contains(linebreak)
-            : false
-        if (!isBroken) {
-          foundFunction(start, end)
-        } else {
-          console.log(`first-second: ${first} ${text.substring(first, second+1)} ${second}`)
-          console.log(`is broken`)}
+    let foundFunction = (
+      foundStart: number,
+      foundEnd: number
+    ) => {
+      console.log(`foundFunction: ${foundStart} ${text.substring(foundStart, foundEnd+1)} ${foundEnd}`)
+      foundFunctionIn(foundStart, foundEnd)
+    }
+    console.log(text)
+    let initial_orNull = getNextXAfter_orNull(text, langSettings.open, -1)
+    let final_orNull = getNextXAfter_orNull(text, langSettings.close, initial_orNull)
+    let final_orEnd = getNextXAfter_orEnd(text, langSettings.close, initial_orNull)
+    if (!initial_orNull && final_orNull) {
+      foundFunction(final_orNull, final_orNull)
+    }
+    while (initial_orNull) {
+      console.log(`basic initial-nextLinebreak_orEnd: ${initial_orNull} ${text.substring(initial_orNull, (final_orNull??initial_orNull)+1)} ${final_orNull}`)
+      const nextInitial_orNull = getNextXAfter_orNull(text, langSettings.open, initial_orNull!)
+      const nextInitial_orEnd = getNextXAfter_orEnd(text, langSettings.open, initial_orNull!)
+      const nextInitialFound = nextInitial_orNull!=null
+      const nextLinebreak_orNull = getNextXAfter_orNull(text, linebreak, initial_orNull!)
+      const nextLinebreak_orEnd = getNextXAfter_orEnd(text, linebreak, initial_orNull!)
+      const nextLinebreakFound = nextLinebreak_orNull!=null
+      const finalFound = () => final_orNull!=null
+      const doubleInitial = 
+        nextInitialFound
+        && nextInitial_orNull! < nextLinebreak_orEnd
+        && 
+        (
+          !finalFound()
+          || nextInitial_orNull! < final_orNull!
+        )
+      if (doubleInitial) {
+        initial_orNull = nextInitial_orNull!
+        final_orNull = getNextXAfter_orNull(text, langSettings.close, initial_orNull)
+        final_orEnd = getNextXAfter_orEnd(text, langSettings.close, initial_orNull)
       }
-      first = getNextOpenAfter_orNegOne(text, langSettings, second)
-      second = getNextCloseAfter_orEnd(text, langSettings, first)
+      console.log(`nextInitialFound: ${nextInitialFound}`)
+      console.log(`nextLinebreak_orNull: ${nextLinebreak_orNull}`)
+      console.log(`nextInitial_orNull: ${nextInitial_orNull}`)
+      console.log(`doubleInitial: ${doubleInitial}`)
+      const initialAtStart = 
+      initial_orNull! == 0
+        || text.substring(
+            initial_orNull!-linebreak.length,
+            initial_orNull!
+          ) == linebreak;
+      final_orNull =
+        initialAtStart
+          ? final_orEnd
+          : final_orNull;
+      let aFinalFound = final_orNull!=null
+      const isBroken =
+        aFinalFound
+        && text.substring(initial_orNull!, final_orNull!).contains(linebreak);      
+      if (initialAtStart && (isBroken || !aFinalFound)) {
+        foundFunction(initial_orNull!, nextLinebreak_orEnd)
+      }
+      if (final_orNull && !isBroken) {
+        foundFunction(initial_orNull!, final_orNull)
+      }
+
+      initial_orNull = getNextXAfter_orNull(text, langSettings.open, initial_orNull!)
+      final_orNull = getNextXAfter_orNull(text, langSettings.close, initial_orNull)
+      final_orEnd = getNextXAfter_orEnd(text, langSettings.close, initial_orNull)
     }
   }
 }
 
-function getNextOpenAfter_orNegOne(
+function getNextXAfter_orNull(
   text: string,
-  langSettings: { open: string; close: string; class: string; },
-  after: number
+  x_string: string,
+  after: number|null
 ) {
-  let toReturn = text.indexOf(langSettings.open, after+1);
-  return toReturn
+  if (after == null) {
+    return null
+  }
+  let nextAfter = 
+    text.indexOf(x_string, after+1);
+  return (
+    nextAfter == -1
+      ? null
+      : nextAfter
+  );
 }
 
-function getNextCloseAfter_orEnd(
+function getNextXAfter_orEnd(
   text: string,
-  langSettings: { open: string; close: string; class: string; },
-  after: number
+  x_string: string,
+  after: number|null
 ) {
-  let toReturn = 
-    after==-1
-      ? -1
-      : text.indexOf(langSettings.close, after+1)
+  let nextAfter = text.indexOf(x_string, (after??-1) + 1);
+  let toReturn =
+    nextAfter == -1
+      ? text.length-1
+      : nextAfter ?? 0
   return toReturn
 }

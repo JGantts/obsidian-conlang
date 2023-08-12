@@ -10,7 +10,6 @@ import {
   ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-import { ConlangText } from "conlangText";
 import checker from "checker"
 
 export const conlangPlugin = 
@@ -23,9 +22,6 @@ export const conlangPlugin =
     
       constructor(view: EditorView) {
         this.decorations = this.buildDecorations(view);
-        /*this.decorations = Decoration.set([
-          Decoration.mark({class: "myconlang"}).range(0, 12)
-        ], true)*/
       }
       
       update(update: ViewUpdate) {
@@ -36,7 +32,6 @@ export const conlangPlugin =
       
       buildDecorations(view: EditorView): DecorationSet {
         const decorations: Range<Decoration>[] = [];
-        //decorations.push(Decoration.mark({class: "myconlang"}).range(0, 8))
         // For every valid parser ⟨ ⟩ pair (starting at 'start' and stopping at 'end', adda  decoration)
     
         for (let { from, to } of view.visibleRanges) {

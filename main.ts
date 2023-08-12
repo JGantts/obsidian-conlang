@@ -27,6 +27,7 @@ export default class MyPlugin extends Plugin {
         class: "myconlang"
       })
     })
+
     this.registerMarkdownPostProcessor((element: HTMLElement, context: MarkdownPostProcessorContext) => {
       checkNode(element, context, {
         open: "[",
@@ -34,6 +35,7 @@ export default class MyPlugin extends Plugin {
         class: "myipalang"
       })
     })
+    
     this.registerMarkdownPostProcessor((element: HTMLElement, context: MarkdownPostProcessorContext) => {
       checkNode(element, context, {
         open: "/",
@@ -41,11 +43,13 @@ export default class MyPlugin extends Plugin {
         class: "myipalang"
       })
     })
+
     this.registerEditorExtension(conlangPlugin({
       open: "⟨",
       close: "⟩",
       class: "myconlang"
     }))
+
     this.registerEditorExtension(conlangPlugin({
       open: "[",
       close: "]",
