@@ -19,6 +19,7 @@ export const conlangPlugin =
     return ViewPlugin.fromClass(class implements PluginValue {
       decorations: DecorationSet;
       dec: Decoration = Decoration.mark({class: langSettings.class});
+      err: Decoration = Decoration.mark({class: langSettings.class + " parse_err"});
     
       constructor(view: EditorView) {
         this.decorations = this.buildDecorations(view);
@@ -56,6 +57,18 @@ export const conlangPlugin =
                   //console.log(`${rangeFrom} ${rangeTo}`)
                   decorations.push(
                     this.dec.range(rangeFrom, rangeTo)
+                  );
+                },
+                (
+                  foundStart: number,
+                  foundEnd: number
+                ) => {
+                  //console.log("EditorExtension B")
+                  let rangeFrom = node.from + foundStart;
+                  let rangeTo = node.from + foundEnd + 1;
+                  //console.log(`${rangeFrom} ${rangeTo}`)
+                  decorations.push(
+                    this.err.range(rangeFrom, rangeTo)
                   );
                 }
               )

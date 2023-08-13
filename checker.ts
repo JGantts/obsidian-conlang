@@ -6,6 +6,10 @@ export default {
     foundFunctionIn: (
       foundStart: number,
       foundEnd: number
+    ) => void,
+    errorFunctionIn: (
+      foundStart: number,
+      foundEnd: number
     ) => void
   ) {
     let foundFunction = (
@@ -20,6 +24,18 @@ export default {
         +` ${foundEnd}`)*/
       foundFunctionIn(foundStart, foundEnd)
     }
+    let errorFunction = (
+      foundStart: number,
+      foundEnd: number
+    ) => {
+      /*console.log(
+        `foundFunction: ${foundStart} `
+        +`${text.substring(foundStart-2, foundStart)}`
+        +`_${text.substring(foundStart, foundEnd+1)}_`
+        +`${text.substring(foundEnd+1, foundEnd+3)}`
+        +` ${foundEnd}`)*/
+        errorFunctionIn(foundStart, foundEnd)
+    }
     let maybeFoundFunction = (
       maybeFoundStart: number|null,
       maybeFoundEnd: number|null
@@ -27,9 +43,9 @@ export default {
       if (maybeFoundStart!=null || maybeFoundEnd!=null) {
         return
       } else if (initial_orNull!=null) {
-        foundFunction(initial_orNull, initial_orNull)
+        errorFunction(initial_orNull!, initial_orNull!)
       } else if (final_orNull!=null) {
-        foundFunction(final_orNull, final_orNull)
+        errorFunction(final_orNull!, final_orNull!)
       }
     }
     let initial_orNull = getNextXAfter_orNull(text, langSettings.open, -1)
@@ -54,7 +70,7 @@ export default {
           || nextInitial_orNull! < final_orNull!
         )
       if (doubleInitial) {
-        foundFunction(initial_orNull!, initial_orNull!)
+        errorFunction(initial_orNull!, initial_orNull!)
         initial_orNull = nextInitial_orNull!
         final_orNull = getNextXAfter_orNull(text, langSettings.close, initial_orNull)
         final_orEnd = getNextXAfter_orEnd(text, langSettings.close, initial_orNull)
@@ -85,7 +101,7 @@ export default {
       } else if (initial_orNull!=null && final_orNull!=null && !isBroken) {
         foundFunction(initial_orNull!, final_orNull)
       } else if (isBroken) {
-        foundFunction(initial_orNull, initial_orNull)
+        errorFunction(initial_orNull, initial_orNull)
       } else {
         maybeFoundFunction(initial_orNull, final_orNull)
       }

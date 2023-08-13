@@ -205,7 +205,7 @@ function checkNode(
     || innerT == element.innerHTML
   ) {
     const text = innerT
-    let pairs: {start: number, end: number}[] = []
+    let cssClasses: {pair: {start: number, end: number}, cssClass: string}[] = []
     if (text) {
       //console.log("MarkdownPostProcessor A")
       checker.check(
@@ -216,24 +216,29 @@ function checkNode(
           start: number,
           end: number
         ) => {
-          //console.log("MarkdownPostProcessor B")
-          pairs.push({start, end})
+          cssClasses.push({pair: {start, end}, cssClass: langSettings.class})
+        },
+        (
+          start: number,
+          end: number
+        ) => {
+          cssClasses.push({pair: {start, end}, cssClass: langSettings.class+" parse_err"})
         }
       )
-      if (pairs.length > 0) {
+      if (cssClasses.length > 0) {
         let htmlElement = element as HTMLElement
         if (htmlElement) {
           if (htmlElement.nodeType == 3) {
             // we're text
             let parent = htmlElement.parentElement
             if (parent) {
-              context.addChild(new Replacement(parent, pairs, htmlElement, langSettings))
+              context.addChild(new Replacement(parent, cssClasses, htmlElement))
             } else {
               console.log("err-dsagf: element")
               console.log(element)
             }
           } else {
-            context.addChild(new Replacement(htmlElement, pairs, htmlElement, langSettings))
+            context.addChild(new Replacement(htmlElement, cssClasses, htmlElement))
           }
         } else {
           console.log("err-tewrt: element")
@@ -253,24 +258,17 @@ function checkNode(
 }
 
 class Replacement extends MarkdownRenderChild {
-  pairs: { start: number; end: number; }[];
+  cssClasses: {pair: {start: number, end: number}, cssClass: string}[];
   replacementEl: Element;
-  langSettings: { open: string; close: string; class: string; };
 
   constructor(
     containerEl: HTMLElement,
-    pairs: {start: number, end: number}[],
+    cssClasses: {pair: {start: number, end: number}, cssClass: string}[],
     replacementEl: Element,
-    langSettings: {
-      open: string,
-      close: string,
-      class: string,
-    }
   ) {
     super(containerEl);
-    this.pairs = pairs;
+    this.cssClasses = cssClasses;
     this.replacementEl = replacementEl
-    this.langSettings = langSettings
   }
 
   onload() {
@@ -284,18 +282,18 @@ class Replacement extends MarkdownRenderChild {
       if (theClass) {
         newSpan.classList.add(theClass)
       }
-      newSpan.classList.add("jgantts_err")
+      //newSpan.classList.add("jgantts_err")
       containerDiv.appendChild(newSpan)
     }
     let text = this.replacementEl.textContent ?? ""
     let lastIndex = 0
     let index = 0
-    while (index <= this.pairs.length-1 && lastIndex < text.length-1) {
-      let currentPair = this.pairs[index]
+    while (index <= this.cssClasses.length-1 && lastIndex < text.length-1) {
+      let currentPair = this.cssClasses[index].pair
       if (currentPair.start > lastIndex) {
         addNewDiv(text.substring(lastIndex, currentPair.start))
       }
-      addNewDiv(text.substring(currentPair.start, currentPair.end+1), this.langSettings.class)
+      addNewDiv(text.substring(currentPair.start, currentPair.end+1), this.cssClasses[index].cssClass)
       lastIndex = currentPair.end+1
       index++
     }
@@ -307,5 +305,6 @@ class Replacement extends MarkdownRenderChild {
     } else {
       this.containerEl.replaceChild(containerDiv, this.replacementEl)
     }
+    ;
   }
 }
