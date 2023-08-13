@@ -4,7 +4,7 @@ import checker from "checker"
 
 // Remember to rename these classes and interfaces!
 
-const VERSION_STRING = "v0.1.4"
+const VERSION_STRING = "v0.1.5"
 
 interface MyPluginSettings {
 	mySetting: string;
@@ -226,6 +226,8 @@ function checkNode(
         }
       )
       if (cssClasses.length > 0) {
+        console.log(text)
+        console.log(cssClasses)
         let htmlElement = element as HTMLElement
         if (htmlElement) {
           if (htmlElement.nodeType == 3) {
@@ -280,7 +282,10 @@ class Replacement extends MarkdownRenderChild {
         text: inner,
       })
       if (theClass) {
-        newSpan.classList.add(theClass)
+        let split = theClass.split(' ')
+        for(let i=0; i<split.length; i++) {
+          newSpan.classList.add(split[i])
+        }
       }
       //newSpan.classList.add("jgantts_err")
       containerDiv.appendChild(newSpan)

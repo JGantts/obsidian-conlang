@@ -40,18 +40,23 @@ export default {
       maybeFoundStart: number|null,
       maybeFoundEnd: number|null
     ) => {
-      if (maybeFoundStart!=null || maybeFoundEnd!=null) {
+      if (maybeFoundStart!=null && maybeFoundEnd!=null) {
         return
-      } else if (initial_orNull!=null) {
-        errorFunction(initial_orNull!, initial_orNull!)
-      } else if (final_orNull!=null) {
-        errorFunction(final_orNull!, final_orNull!)
+      } else if (maybeFoundStart!=null) {
+        if (maybeFoundStart==1) {
+          console.log(text)
+          console.log(new Error().stack)
+        }
+        errorFunction(maybeFoundStart!, maybeFoundStart!)
+      } else if (maybeFoundEnd!=null) {
+        errorFunction(maybeFoundEnd!, maybeFoundEnd!)
       }
     }
     let initial_orNull = getNextXAfter_orNull(text, langSettings.open, -1)
     let final_orNull = getNextXAfter_orNull(text, langSettings.close, initial_orNull)
     let final_orEnd = getNextXAfter_orEnd(text, langSettings.close, initial_orNull)
-    maybeFoundFunction(initial_orNull, final_orNull)
+    //console.log(`${initial_orNull} ${final_orNull}`)
+    //maybeFoundFunction(initial_orNull, final_orNull)
     while (initial_orNull != null) {
       const nextInitial_orNull = getNextXAfter_orNull(text, langSettings.open, initial_orNull!)
       const nextInitial_orEnd = getNextXAfter_orEnd(text, langSettings.open, initial_orNull!)
@@ -96,7 +101,8 @@ export default {
           langSettings,
           linebreak,
           initial_orNull!,
-          foundFunction
+          foundFunction,
+          errorFunction
         )
       } else if (initial_orNull!=null && final_orNull!=null && !isBroken) {
         foundFunction(initial_orNull!, final_orNull)
@@ -124,6 +130,10 @@ function openEnded(
   linebreak: string,
   initial: number,
   foundFunction: (
+    foundStart: number,
+    foundEnd: number
+  ) => void,
+  errorFunction: (
     foundStart: number,
     foundEnd: number
   ) => void
@@ -230,7 +240,7 @@ function openEnded(
   if (isCompleteClosedEnded) {
     foundFunction(initial, nextLinebreak_orEnd)
   } else {
-    foundFunction(initial, initial)
+    errorFunction(initial, initial)
   }
 }
 
