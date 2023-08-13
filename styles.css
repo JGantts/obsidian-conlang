@@ -1,8 +1,89 @@
-/*
+/* @settings
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
+name: JGantts Conlang
+id: jgantts-conlang
+settings:
+    -
+        id: jgantts-conlang-accents-title
+        title: Text Accent
+        type: heading
+        level: 1
+    -
+        id: conlang-accent
+        title: Conlang
+        type: variable-themed-color
+        opacity: false
+        format: rgb
+        default-light: rgb(41, 124, 59)
+        default-dark: rgb(99, 193, 116)
+    -
+        id: ipa-accent
+        title: IPA
+        type: variable-themed-color
+        opacity: false
+        format: rgb
+        default-light: rgb(12, 119, 146)
+        default-dark: rgb(0, 194, 215)
+    -
+        id: parseerr-accent
+        title: Error
+        type: variable-themed-color
+        opacity: false
+        format: rgb
+        default-light: rgb(205, 43, 49)
+        default-dark: rgb(255, 99, 105)
 */
+
+/*
+Tables
+*/
+body {
+  --table-column-first-border-width: 0;
+  --table-column-last-border-width: 0;
+  --table-header-border-width: 0;
+  --table-row-last-border-width: 0;
+  --table-header-border-width: 0;
+}
+
+
+.markdown-preview-view td,
+.markdown-preview-view th {
+  border-right-color: transparent;
+  border-left-color: transparent;
+
+}
+
+.markdown-rendered table {
+  margin: 1.5em 0;
+}
+
+.markdown-rendered thead tr > th {
+  --table-header-border-color: #00000000;
+  border-bottom: inherit;
+}
+
+
+/*
+Accents
+*/
+.conlang-accent {
+  --font-text: 'Junicode';
+  font-family: 'Junicode';
+  font-weight: 400;
+  --table-text-color: var(--conlang-accent);
+  color: var(--conlang-accent);
+}
+
+.ipa-accent {
+  --font-text: 'Inter';
+  font-family: 'Inter';
+  font-weight: 100;
+  --table-text-color: var(--ipa-accent);
+  color: var(--ipa-accent);
+}
+
+.parseerr-accent {
+  font-weight: 700;
+  --table-text-color: var(--parseerr-accent);
+  color: var(--parseerr-accent);
+}

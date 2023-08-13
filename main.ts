@@ -24,7 +24,8 @@ export default class MyPlugin extends Plugin {
       checkNode(element, context, {
         open: "⟨",
         close: "⟩",
-        class: "myconlang"
+        class: "conlang-accent",
+        errorClass: "conlang-accent parseerr-accent"
       })
     })
 
@@ -32,7 +33,8 @@ export default class MyPlugin extends Plugin {
       checkNode(element, context, {
         open: "[",
         close: "]",
-        class: "myipalang"
+        class: "ipa-accent",
+        errorClass: ""
       })
     })
     
@@ -40,25 +42,29 @@ export default class MyPlugin extends Plugin {
       checkNode(element, context, {
         open: "/",
         close: "/",
-        class: "myipalang"
+        class: "ipa-accent",
+        errorClass: ""
       })
     })
 
     this.registerEditorExtension(conlangPlugin({
       open: "⟨",
       close: "⟩",
-      class: "myconlang"
+      class: "conlang-accent",
+      errorClass: "conlang-accent parseerr-accent"
     }))
 
     this.registerEditorExtension(conlangPlugin({
       open: "[",
       close: "]",
-      class: "myipalang"
+      class: "ipa-accent",
+      errorClass: ""
     }))
     this.registerEditorExtension(conlangPlugin({
       open: "/",
       close: "/",
-      class: "myipalang"
+      class: "ipa-accent",
+      errorClass: ""
     }))
 
 
@@ -122,6 +128,8 @@ export default class MyPlugin extends Plugin {
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		//this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+
+    app.workspace.trigger("parse-style-settings")
 	}
 
 	onunload() {
@@ -188,6 +196,7 @@ function checkNode(
     open: string,
     close: string,
     class: string,
+    errorClass: string,
   }
 ) {
   if (
@@ -222,12 +231,12 @@ function checkNode(
           start: number,
           end: number
         ) => {
-          cssClasses.push({pair: {start, end}, cssClass: langSettings.class+" parse_err"})
+          cssClasses.push({pair: {start, end}, cssClass: langSettings.errorClass})
         }
       )
       if (cssClasses.length > 0) {
-        console.log(text)
-        console.log(cssClasses)
+        //console.log(text)
+        //console.log(cssClasses)
         let htmlElement = element as HTMLElement
         if (htmlElement) {
           if (htmlElement.nodeType == 3) {

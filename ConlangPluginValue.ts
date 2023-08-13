@@ -14,12 +14,12 @@ import checker from "checker"
 
 export const conlangPlugin = 
   (
-    langSettings: { open: string; close: string; class: string; }
+    langSettings: { open: string; close: string; class: string; errorClass: string; }
   ) => {
     return ViewPlugin.fromClass(class implements PluginValue {
       decorations: DecorationSet;
       dec: Decoration = Decoration.mark({class: langSettings.class});
-      err: Decoration = Decoration.mark({class: langSettings.class + " parse_err"});
+      err: Decoration = Decoration.mark({class: langSettings.errorClass});
     
       constructor(view: EditorView) {
         this.decorations = this.buildDecorations(view);
