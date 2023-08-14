@@ -25,7 +25,7 @@ export default class MyPlugin extends Plugin {
         open: "⟨",
         close: "⟩",
         class: "conlang-accent",
-        errorClass: "conlang-accent parseerr-accent"
+        errorClass: ""//"conlang-accent parseerr-accent"
       })
     })
 
@@ -34,7 +34,7 @@ export default class MyPlugin extends Plugin {
         open: "[",
         close: "]",
         class: "ipa-accent",
-        errorClass: ""
+        errorClass: ""//""
       })
     })
     
@@ -43,7 +43,7 @@ export default class MyPlugin extends Plugin {
         open: "/",
         close: "/",
         class: "ipa-accent",
-        errorClass: ""
+        errorClass: ""//""
       })
     })
 
@@ -51,20 +51,20 @@ export default class MyPlugin extends Plugin {
       open: "⟨",
       close: "⟩",
       class: "conlang-accent",
-      errorClass: "conlang-accent parseerr-accent"
+      errorClass: ""//"conlang-accent parseerr-accent"
     }))
 
     this.registerEditorExtension(conlangPlugin({
       open: "[",
       close: "]",
       class: "ipa-accent",
-      errorClass: ""
+      errorClass: ""//""
     }))
     this.registerEditorExtension(conlangPlugin({
       open: "/",
       close: "/",
       class: "ipa-accent",
-      errorClass: ""
+      errorClass: ""//""
     }))
 
 
