@@ -94,7 +94,6 @@ export default {
       const isBroken =
         aFinalFound
         && existsXInBewtween(text, linebreak, null, initial_orNull!, final_orNull!)
-      console.log(`isBroken: ${isBroken}`)
       const isOpenEnded = initialAtStart && (isBroken || !aFinalFound)
       if (isOpenEnded) {
         openEnded(
@@ -256,31 +255,15 @@ function getNextXAfter_orNull(
   if (after == null) {
     return null
   }
-
-  let nextAfter = 
-    text.indexOf(x_string, after+1);
-  let toReturn = (
-    nextAfter == -1
-      ? null
-      : nextAfter
-  );
-
-  let re: RegExp
-  if (xIsOpen==true) {
-    re = new RegExp(`${x_string}`);
-  } else if (xIsOpen==false) {
-    re = new RegExp(`${x_string}`);
-  } else {
-    re = new RegExp(`${x_string}`);
-  }
+  const re = buildRegEx(x_string, xIsOpen)
   let searchStart = after+1
   let substring = 
     text.substring(searchStart)
-  let nextAfter_ = substring.search(re)
-  let toReturn_ = (
-    nextAfter_ == -1
+  let nextAfter = substring.search(re)
+  let toReturn = (
+    nextAfter == -1
       ? null
-      : nextAfter_ + searchStart
+      : nextAfter + searchStart
   );
   return toReturn
 }
@@ -294,14 +277,7 @@ function getNextXAfter_orEnd(
   if (after == null) {
     return text.length-1
   }
-  let re: RegExp
-  if (xIsOpen==true) {
-    re = new RegExp(`${x_string}`);
-  } else if (xIsOpen==false) {
-    re = new RegExp(`${x_string}`);
-  } else {
-    re = new RegExp(`${x_string}`);
-  }
+  const re = buildRegEx(x_string, xIsOpen)
   let searchStart = after+1
   let nextAfter = 
     text.substring(searchStart).search(re)
@@ -319,13 +295,23 @@ function existsXInBewtween(
   initial: number,
   final: number,
 ): boolean {
+  const re = buildRegEx(x_string, xIsOpen)
+  return text.substring(initial!, final!).search(re) != -1; 
+}
+
+function escapeRegExp(text: string) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+function buildRegEx(x_string: string, xIsOpen: boolean|null) {
+  let escaped = escapeRegExp(x_string)
   let re: RegExp
   if (xIsOpen==true) {
-    re = new RegExp(`${x_string}`);
+    re = new RegExp(`${escaped}`);
   } else if (xIsOpen==false) {
-    re = new RegExp(`${x_string}`);
+    re = new RegExp(`${escaped}`);
   } else {
-    re = new RegExp(`${x_string}`);
+    re = new RegExp(`${escaped}`);
   }
-  return text.substring(initial!, final!).search(re) != -1; 
+  return re
 }
