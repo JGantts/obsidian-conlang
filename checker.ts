@@ -307,9 +307,9 @@ function buildRegEx(x_string: string, xIsOpen: boolean|null) {
   let escaped = escapeRegExp(x_string)
   let re: RegExp
   if (xIsOpen==true) {
-    re = new RegExp(`${escaped}`);
+    re = new RegExp(`\\B${escaped}\\b`);
   } else if (xIsOpen==false) {
-    re = new RegExp(`${escaped}`);
+    re = new RegExp(`\\b${escaped}\\B`);
   } else {
     re = new RegExp(`${escaped}`);
   }
