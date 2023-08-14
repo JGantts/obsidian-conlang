@@ -52,17 +52,17 @@ export default {
         errorFunction(maybeFoundEnd!, maybeFoundEnd!)
       }
     }
-    let initial_orNull = getNextXAfter_orNull(text, langSettings.open, -1)
-    let final_orNull = getNextXAfter_orNull(text, langSettings.close, initial_orNull)
-    let final_orEnd = getNextXAfter_orEnd(text, langSettings.close, initial_orNull)
+    let initial_orNull = getNextXAfter_orNull(text, langSettings.open, true, -1)
+    let final_orNull = getNextXAfter_orNull(text, langSettings.close, false, initial_orNull)
+    let final_orEnd = getNextXAfter_orEnd(text, langSettings.close, false, initial_orNull)
     //console.log(`${initial_orNull} ${final_orNull}`)
     //maybeFoundFunction(initial_orNull, final_orNull)
     while (initial_orNull != null) {
-      const nextInitial_orNull = getNextXAfter_orNull(text, langSettings.open, initial_orNull!)
-      const nextInitial_orEnd = getNextXAfter_orEnd(text, langSettings.open, initial_orNull!)
+      const nextInitial_orNull = getNextXAfter_orNull(text, langSettings.open, true, initial_orNull!)
+      const nextInitial_orEnd = getNextXAfter_orEnd(text, langSettings.open, true, initial_orNull!)
       const nextInitialFound = nextInitial_orNull!=null
-      const nextLinebreak_orNull = getNextXAfter_orNull(text, linebreak, initial_orNull!)
-      const nextLinebreak_orEnd = getNextXAfter_orEnd(text, linebreak, initial_orNull!)
+      const nextLinebreak_orNull = getNextXAfter_orNull(text, linebreak, null, initial_orNull!)
+      const nextLinebreak_orEnd = getNextXAfter_orEnd(text, linebreak, null, initial_orNull!)
       const nextLinebreakFound = nextLinebreak_orNull!=null
       const finalFound = () => final_orNull!=null
       const doubleInitial = 
@@ -77,8 +77,8 @@ export default {
       if (doubleInitial) {
         errorFunction(initial_orNull!, initial_orNull!)
         initial_orNull = nextInitial_orNull!
-        final_orNull = getNextXAfter_orNull(text, langSettings.close, initial_orNull)
-        final_orEnd = getNextXAfter_orEnd(text, langSettings.close, initial_orNull)
+        final_orNull = getNextXAfter_orNull(text, langSettings.close, false, initial_orNull)
+        final_orEnd = getNextXAfter_orEnd(text, langSettings.close, false, initial_orNull)
       }
       const initialAtStart = 
         initial_orNull! == 0
@@ -93,7 +93,8 @@ export default {
       let aFinalFound = final_orNull!=null
       const isBroken =
         aFinalFound
-        && existsXInBewtween(text, linebreak, initial_orNull!, final_orNull!)
+        && existsXInBewtween(text, linebreak, null, initial_orNull!, final_orNull!)
+      console.log(`isBroken: ${isBroken}`)
       const isOpenEnded = initialAtStart && (isBroken || !aFinalFound)
       if (isOpenEnded) {
         openEnded(
@@ -113,12 +114,12 @@ export default {
       }
 
       if (langSettings.open == langSettings.close) {
-        initial_orNull = getNextXAfter_orNull(text, langSettings.open, final_orNull!)
+        initial_orNull = getNextXAfter_orNull(text, langSettings.open, true, final_orNull!)
       } else {
-        initial_orNull = getNextXAfter_orNull(text, langSettings.open, initial_orNull!)
+        initial_orNull = getNextXAfter_orNull(text, langSettings.open, true, initial_orNull!)
       }
-      final_orNull = getNextXAfter_orNull(text, langSettings.close, initial_orNull)
-      final_orEnd = getNextXAfter_orEnd(text, langSettings.close, initial_orNull)
+      final_orNull = getNextXAfter_orNull(text, langSettings.close, false, initial_orNull)
+      final_orEnd = getNextXAfter_orEnd(text, langSettings.close, false, initial_orNull)
     }
     maybeFoundFunction(initial_orNull, final_orNull)
   }
@@ -138,14 +139,14 @@ function openEnded(
     foundEnd: number
   ) => void
 ) {
-  const nextLinebreak_orEnd = getNextXAfter_orEnd(text, linebreak, initial)
+  const nextLinebreak_orEnd = getNextXAfter_orEnd(text, linebreak, null, initial)
   let isCompleteClosedEnded: boolean
-  let potentialFinal = getNextXAfter_orNull(text, langSettings.close, initial)
+  let potentialFinal = getNextXAfter_orNull(text, langSettings.close, false, initial)
   if (potentialFinal!=null) {
     const potentialFinalIsEnd = potentialFinal==text.length-langSettings.close.length
     if (!potentialFinalIsEnd) {
       let potentialSubsequentLineBreak =
-        getNextXAfter_orNull(text, linebreak, potentialFinal!)
+        getNextXAfter_orNull(text, linebreak, null, potentialFinal!)
       const potentialFinalIsAtEndOfParagraph = 
         ((potentialFinal!)+langSettings.close.length)
         == potentialSubsequentLineBreak
@@ -175,7 +176,7 @@ function openEnded(
         }
       }
       lastNewlineInChainPrev -= linebreak.length
-      currentNewline = getNextXAfter_orEnd(text, linebreak, lastNewlineInChainPrev)
+      currentNewline = getNextXAfter_orEnd(text, linebreak, null, lastNewlineInChainPrev)
       let insideFinal = (currentNewline??0) <= potentialFinal+linebreak.length
       let atFinal = (currentNewline??0) == potentialFinal+linebreak.length
       if (!insideFinal) {
@@ -207,6 +208,7 @@ function openEnded(
           || existsXInBewtween(
             text,
             langSettings.open,
+            true,
             thisLineExclOpen_start,
             thisLine_end
           )
@@ -217,6 +219,7 @@ function openEnded(
             || existsXInBewtween(
               text,
               langSettings.close,
+              false,
               thisLine_start,
               thisLine_end
             )
@@ -247,38 +250,82 @@ function openEnded(
 function getNextXAfter_orNull(
   text: string,
   x_string: string,
+  xIsOpen: boolean|null,
   after: number|null
 ) {
   if (after == null) {
     return null
   }
+
   let nextAfter = 
     text.indexOf(x_string, after+1);
-  return (
+  let toReturn = (
     nextAfter == -1
       ? null
       : nextAfter
   );
+
+  let re: RegExp
+  if (xIsOpen==true) {
+    re = new RegExp(`${x_string}`);
+  } else if (xIsOpen==false) {
+    re = new RegExp(`${x_string}`);
+  } else {
+    re = new RegExp(`${x_string}`);
+  }
+  let searchStart = after+1
+  let substring = 
+    text.substring(searchStart)
+  let nextAfter_ = substring.search(re)
+  let toReturn_ = (
+    nextAfter_ == -1
+      ? null
+      : nextAfter_ + searchStart
+  );
+  return toReturn
 }
 
 function getNextXAfter_orEnd(
   text: string,
   x_string: string,
+  xIsOpen: boolean|null,
   after: number|null
-) {
-  let nextAfter = text.indexOf(x_string, (after??-1) + 1);
-  let toReturn =
+): number {
+  if (after == null) {
+    return text.length-1
+  }
+  let re: RegExp
+  if (xIsOpen==true) {
+    re = new RegExp(`${x_string}`);
+  } else if (xIsOpen==false) {
+    re = new RegExp(`${x_string}`);
+  } else {
+    re = new RegExp(`${x_string}`);
+  }
+  let searchStart = after+1
+  let nextAfter = 
+    text.substring(searchStart).search(re)
+  return (
     nextAfter == -1
       ? text.length-1
-      : nextAfter ?? 0
-  return toReturn
+      : nextAfter + searchStart
+  );
 }
 
 function existsXInBewtween(
   text: string,
   x_string: string,
+  xIsOpen: boolean|null,
   initial: number,
   final: number,
-) {
-  return text.substring(initial!, final!).contains(x_string); 
+): boolean {
+  let re: RegExp
+  if (xIsOpen==true) {
+    re = new RegExp(`${x_string}`);
+  } else if (xIsOpen==false) {
+    re = new RegExp(`${x_string}`);
+  } else {
+    re = new RegExp(`${x_string}`);
+  }
+  return text.substring(initial!, final!).search(re) != -1; 
 }
