@@ -306,10 +306,15 @@ function escapeRegExp(text: string) {
 function buildRegEx(x_string: string, xIsOpen: boolean|null) {
   let escaped = escapeRegExp(x_string)
   let re: RegExp
+  let whiteSpaceOrStart = "\\s|^"
+  let whiteSpaceOrEnd = "\\s|$"
+  let nonWhitespace = `\\S`
+  let sentenceBounaryChars = `\\.|,`
+  let hyphensDahses = `-|~`
   if (xIsOpen==true) {
-    re = new RegExp(`\\B${escaped}\\b`);
+    re = new RegExp(`(?<=${whiteSpaceOrStart}|${hyphensDahses})${escaped}(?=${nonWhitespace})`);
   } else if (xIsOpen==false) {
-    re = new RegExp(`\\b${escaped}\\B`);
+    re = new RegExp(`(?<=${nonWhitespace}|${sentenceBounaryChars})${escaped}(?=${whiteSpaceOrEnd}|${sentenceBounaryChars}|${hyphensDahses})`);
   } else {
     re = new RegExp(`${escaped}`);
   }

@@ -4,7 +4,7 @@ import checker from "checker"
 
 // Remember to rename these classes and interfaces!
 
-const VERSION_STRING = "v0.1.5"
+const VERSION_STRING = "v0.1.6"
 
 interface MyPluginSettings {
 	mySetting: string;
