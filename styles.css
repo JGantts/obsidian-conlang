@@ -34,6 +34,18 @@ settings:
         default-dark: rgb(255, 99, 105)
 */
 
+.theme-light {
+  --conlang-accent-final: var(--conlang-accent, rgb(41, 124, 59));
+  --ipa-accent-final: var(--ipa-accent, rgb(12, 119, 146));
+  --parseerr-accent-final: var(--parseerr-accent, rgb(205, 43, 49));
+}
+
+.theme-dark {
+  --conlang-accent-final: var(--conlang-accent, gb(99, 193, 116));
+  --ipa-accent-final: var(--ipa-accent, rgb(0, 194, 215));
+  --parseerr-accent-final: var(--parseerr-accent, rgb(255, 99, 105));
+}
+
 /*
 Tables
 */
@@ -70,20 +82,20 @@ Accents
   --font-text: 'Junicode';
   font-family: 'Junicode';
   font-weight: 400;
-  --table-text-color: var(--conlang-accent);
-  color: var(--conlang-accent);
+  --table-text-color: var(--conlang-accent-final);
+  color: var(--conlang-accent-final);
 }
 
 .ipa-accent {
   --font-text: 'Inter';
   font-family: 'Inter';
   font-weight: 100;
-  --table-text-color: var(--ipa-accent);
-  color: var(--ipa-accent);
+  --table-text-color: var(--ipa-accent-final);
+  color: var(--ipa-accent-final);
 }
 
 .parseerr-accent {
   font-weight: 700;
-  --table-text-color: var(--parseerr-accent);
-  color: var(--parseerr-accent);
+  --table-text-color: var(--parseerr-accent-final);
+  color: var(--parseerr-accent-final);
 }
