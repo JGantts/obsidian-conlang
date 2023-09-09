@@ -4,7 +4,7 @@ import checker from "checker"
 
 // Remember to rename these classes and interfaces!
 
-const VERSION_STRING = "v0.2.1"
+const VERSION_STRING = "v0.2.2"
 
 interface MyPluginSettings {
 	mySetting: string;
@@ -226,6 +226,18 @@ function checkNode(
           end: number
         ) => {
           cssClasses.push({pair: {start, end}, cssClass: langSettings.class})
+        },
+        (
+          start: number,
+          end: number
+        ) => {
+          cssClasses.push({pair: {start, end}, cssClass: `${langSettings.class} jgantts-nowrap`})
+        },
+        (
+          start: number,
+          end: number
+        ) => {
+          cssClasses.push({pair: {start, end}, cssClass: "jgantts-nowrap"})
         },
         (
           start: number,

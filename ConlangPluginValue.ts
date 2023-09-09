@@ -19,6 +19,8 @@ export const conlangPlugin =
     return ViewPlugin.fromClass(class implements PluginValue {
       decorations: DecorationSet;
       dec: Decoration = Decoration.mark({class: langSettings.class});
+      foundNowrap: Decoration = Decoration.mark({class: `${langSettings.class} jgantts-nowrap`});
+      nowrap: Decoration = Decoration.mark({class: "jgantts-nowrap"});
       err: Decoration = Decoration.mark({class: langSettings.errorClass});
     
       constructor(view: EditorView) {
@@ -51,12 +53,32 @@ export const conlangPlugin =
                   foundStart: number,
                   foundEnd: number
                 ) => {
+                  let rangeFrom = node.from + foundStart;
+                  let rangeTo = node.from + foundEnd + 1;
+                  decorations.push(
+                    this.dec.range(rangeFrom, rangeTo)
+                  );
+                },
+                (
+                  foundStart: number,
+                  foundEnd: number
+                ) => {
+                  let rangeFrom = node.from + foundStart;
+                  let rangeTo = node.from + foundEnd + 1;
+                  decorations.push(
+                    this.foundNowrap.range(rangeFrom, rangeTo)
+                  );
+                },
+                (
+                  foundStart: number,
+                  foundEnd: number
+                ) => {
                   //console.log("EditorExtension B")
                   let rangeFrom = node.from + foundStart;
                   let rangeTo = node.from + foundEnd + 1;
                   //console.log(`${rangeFrom} ${rangeTo}`)
                   decorations.push(
-                    this.dec.range(rangeFrom, rangeTo)
+                    this.nowrap.range(rangeFrom, rangeTo)
                   );
                 },
                 (

@@ -7,6 +7,14 @@ export default {
       foundStart: number,
       foundEnd: number
     ) => void,
+    foundNowrapFunctionIn: (
+      foundStart: number,
+      foundEnd: number
+    ) => void,
+    nowrapFunctionIn: (
+      foundStart: number,
+      foundEnd: number
+    ) => void,
     errorFunctionIn: (
       foundStart: number,
       foundEnd: number
@@ -22,7 +30,36 @@ export default {
         +`_${text.substring(foundStart, foundEnd+1)}_`
         +`${text.substring(foundEnd+1, foundEnd+3)}`
         +` ${foundEnd}`)*/
-      foundFunctionIn(foundStart, foundEnd)
+      if (text.substring(foundStart, foundEnd).match(/\s+/)) {
+        console.log(text.substring(foundStart, foundEnd))
+        let nowrapOneStart = foundStart + langSettings.open.length
+        nowrapFunctionIn(
+          foundStart,
+          nowrapOneStart + (text.codePointAt(nowrapOneStart)?.toString().length ?? 1)
+        )
+        let nowrapTwoEnd = foundEnd - langSettings.close.length
+        nowrapFunctionIn(
+          nowrapTwoEnd - (text.codePointAt(nowrapTwoEnd)?.toString().length ?? 1),
+          foundEnd
+        )
+        foundFunctionIn(
+          foundStart,
+          foundEnd
+        )
+      } else {
+        foundNowrapFunctionIn(
+          foundStart,
+          foundEnd
+        )
+        /*foundFunctionIn(
+          foundStart,
+          foundEnd
+        )
+        nowrapFunctionIn(
+          foundStart,
+          foundEnd
+        )*/
+      }
     }
     let errorFunction = (
       foundStart: number,
@@ -105,7 +142,10 @@ export default {
           errorFunction
         )
       } else if (initial_orNull!=null && final_orNull!=null && !isBroken) {
-        foundFunction(initial_orNull!, final_orNull)
+        foundFunction(
+          initial_orNull!,
+          final_orNull
+        )
       } else if (isBroken) {
         errorFunction(initial_orNull, initial_orNull)
       } else {
@@ -130,8 +170,8 @@ function openEnded(
   linebreak: string,
   initial: number,
   foundFunction: (
-    foundStart: number,
-    foundEnd: number
+    openFirstChar: number,
+    closeLastChar: number
   ) => void,
   errorFunction: (
     foundStart: number,
@@ -240,7 +280,10 @@ function openEnded(
     }
   }
   if (isCompleteClosedEnded) {
-    foundFunction(initial, nextLinebreak_orEnd)
+    foundFunction(
+      initial,
+      nextLinebreak_orEnd
+    )
   } else {
     errorFunction(initial, initial)
   }

@@ -84,8 +84,6 @@ Accents
   font-weight: 400;
   --table-text-color: var(--conlang-accent-final);
   color: var(--conlang-accent-final);
-
-  white-space: nowrap;
 }
 
 .ipa-accent {
@@ -94,15 +92,15 @@ Accents
   font-weight: 100;
   --table-text-color: var(--ipa-accent-final);
   color: var(--ipa-accent-final);
-
-  white-space: nowrap;
 }
 
 .parseerr-accent {
   font-weight: 700;
   --table-text-color: var(--parseerr-accent-final);
   color: var(--parseerr-accent-final);
+}
 
+.jgantts-nowrap {
   white-space: nowrap;
 }
 
