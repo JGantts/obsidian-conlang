@@ -84,6 +84,8 @@ Accents
   font-weight: 400;
   --table-text-color: var(--conlang-accent-final);
   color: var(--conlang-accent-final);
+
+  white-space: nowrap;
 }
 
 .ipa-accent {
@@ -92,10 +94,22 @@ Accents
   font-weight: 100;
   --table-text-color: var(--ipa-accent-final);
   color: var(--ipa-accent-final);
+
+  white-space: nowrap;
 }
 
 .parseerr-accent {
   font-weight: 700;
   --table-text-color: var(--parseerr-accent-final);
   color: var(--parseerr-accent-final);
+
+  white-space: nowrap;
+}
+
+.cm-embed-block.markdown-rendered .block-language-dataview th, .cm-embed-block.markdown-rendered .block-language-dataview td, .markdown-rendered table th, .markdown-rendered table td, .markdown-rendered .table-view-table th, .markdown-rendered .table-view-table td {
+  padding: 0.6em !important;
+}
+
+.cm-embed-block.markdown-rendered .block-language-dataview, .markdown-rendered table, .markdown-rendered .table-view-table {
+  width: initial !important;
 }
