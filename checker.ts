@@ -26,24 +26,44 @@ export default {
         +`_${text.substring(foundStart, foundEnd+1)}_`
         +`${text.substring(foundEnd+1, foundEnd+3)}`
         +` ${foundEnd}`)*/
+
+   function unicodeLength(unicodeText: string, index: number) {
+    return (String.fromCodePoint(unicodeText.codePointAt(index) ?? 65).length ?? 1)
+   }
+
       if (text.substring(foundStart, foundEnd).match(/\s+/)) {
-        let nowrapOneStart = foundStart + langSettings.open.length
-        let nowrapTwoEnd = foundEnd - langSettings.close.length
+        let nowrapOneStart = foundStart
+        let nowrapOneCharStart = foundStart
+        let nowrapOneTextStart = nowrapOneCharStart + unicodeLength(text, nowrapOneCharStart)
+        let nowrapOneTextEnd = nowrapOneTextStart + unicodeLength(text, nowrapOneTextStart) - 1
+        let nowrapOneEnd = nowrapOneTextEnd
+
+        let nowrapTwoEnd = foundEnd
+        let nowrapTwoCharEnd = nowrapTwoEnd
+        let nowrapTwoTextEnd = nowrapTwoCharEnd - unicodeLength(text, nowrapTwoCharEnd)
+        let nowrapTwoTextStart = nowrapTwoTextEnd - unicodeLength(text, nowrapTwoTextEnd) + 1
+        let nowrapTwoStart = nowrapTwoTextStart
+        
         foundNowrapFunctionIn(
-          foundStart,
-          nowrapOneStart + (text.codePointAt(nowrapOneStart)?.toString().length ?? 1)
-        )
-        foundFunctionIn(
-          nowrapOneStart + (text.codePointAt(nowrapOneStart)?.toString().length ?? 1),
-          nowrapTwoEnd - (text.codePointAt(nowrapTwoEnd)?.toString().length ?? 1)
+          nowrapOneStart,
+          nowrapOneEnd
         )
         foundNowrapFunctionIn(
-          nowrapTwoEnd - (text.codePointAt(nowrapTwoEnd)?.toString().length ?? 1),
-          foundEnd
+          nowrapOneEnd + 1,
+          nowrapTwoStart - 1
         )
-        console.log(text.substring(foundStart, foundEnd))
-        console.log(text.substring(foundStart, nowrapOneStart + (text.codePointAt(nowrapOneStart)?.toString().length ?? 1)))
-        console.log(text.substring(nowrapTwoEnd - (text.codePointAt(nowrapTwoEnd)?.toString().length ?? 1), foundEnd))
+        foundNowrapFunctionIn(
+          nowrapTwoStart,
+          nowrapTwoEnd
+        )
+        console.log(nowrapOneStart)
+        console.log(nowrapOneEnd)
+        console.log(text.substring(nowrapOneStart, nowrapOneEnd))
+        console.log(nowrapTwoStart)
+        console.log(nowrapTwoEnd)
+        console.log(text.substring(nowrapTwoStart, nowrapTwoEnd))
+        //console.log(text.substring(foundStart, nowrapOneStart + (text.codePointAt(nowrapOneStart)?.toString().length ?? 1)))
+        //console.log(text.substring(nowrapTwoEnd - (text.codePointAt(nowrapTwoEnd)?.toString().length ?? 1), foundEnd))
         console.log('---')
       } else {
         foundNowrapFunctionIn(
