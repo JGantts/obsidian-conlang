@@ -11,10 +11,6 @@ export default {
       foundStart: number,
       foundEnd: number
     ) => void,
-    nowrapFunctionIn: (
-      foundStart: number,
-      foundEnd: number
-    ) => void,
     errorFunctionIn: (
       foundStart: number,
       foundEnd: number
@@ -31,21 +27,24 @@ export default {
         +`${text.substring(foundEnd+1, foundEnd+3)}`
         +` ${foundEnd}`)*/
       if (text.substring(foundStart, foundEnd).match(/\s+/)) {
-        console.log(text.substring(foundStart, foundEnd))
         let nowrapOneStart = foundStart + langSettings.open.length
-        nowrapFunctionIn(
+        let nowrapTwoEnd = foundEnd - langSettings.close.length
+        foundNowrapFunctionIn(
           foundStart,
           nowrapOneStart + (text.codePointAt(nowrapOneStart)?.toString().length ?? 1)
         )
-        let nowrapTwoEnd = foundEnd - langSettings.close.length
-        nowrapFunctionIn(
+        foundFunctionIn(
+          nowrapOneStart + (text.codePointAt(nowrapOneStart)?.toString().length ?? 1),
+          nowrapTwoEnd - (text.codePointAt(nowrapTwoEnd)?.toString().length ?? 1)
+        )
+        foundNowrapFunctionIn(
           nowrapTwoEnd - (text.codePointAt(nowrapTwoEnd)?.toString().length ?? 1),
           foundEnd
         )
-        foundFunctionIn(
-          foundStart,
-          foundEnd
-        )
+        console.log(text.substring(foundStart, foundEnd))
+        console.log(text.substring(foundStart, nowrapOneStart + (text.codePointAt(nowrapOneStart)?.toString().length ?? 1)))
+        console.log(text.substring(nowrapTwoEnd - (text.codePointAt(nowrapTwoEnd)?.toString().length ?? 1), foundEnd))
+        console.log('---')
       } else {
         foundNowrapFunctionIn(
           foundStart,

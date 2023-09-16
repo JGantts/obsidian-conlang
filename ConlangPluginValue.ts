@@ -78,18 +78,6 @@ export const conlangPlugin =
                   let rangeTo = node.from + foundEnd + 1;
                   //console.log(`${rangeFrom} ${rangeTo}`)
                   decorations.push(
-                    this.nowrap.range(rangeFrom, rangeTo)
-                  );
-                },
-                (
-                  foundStart: number,
-                  foundEnd: number
-                ) => {
-                  //console.log("EditorExtension B")
-                  let rangeFrom = node.from + foundStart;
-                  let rangeTo = node.from + foundEnd + 1;
-                  //console.log(`${rangeFrom} ${rangeTo}`)
-                  decorations.push(
                     this.err.range(rangeFrom, rangeTo)
                   );
                 }
