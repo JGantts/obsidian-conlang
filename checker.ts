@@ -24,6 +24,9 @@ export default {
       foundStart: number,
       foundEnd: number
     ) => {
+      console.log("---")
+      console.log(text.substring(foundStart-2, foundEnd+2))
+      console.log(text.substring(foundStart, foundEnd))
       if (text.substring(foundStart, foundEnd).match(/\s+/)) {
         let nowrapOneStart = foundStart
         let nowrapOneCharStart = foundStart
@@ -41,7 +44,7 @@ export default {
           nowrapOneStart,
           nowrapOneEnd
         )
-        foundNowrapFunctionIn(
+        foundFunctionIn(
           nowrapOneEnd + 1,
           nowrapTwoStart - 1
         )
