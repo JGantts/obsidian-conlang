@@ -1,3 +1,7 @@
+function unicodeLength(unicodeText: string, index: number) {
+  return (String.fromCodePoint(unicodeText.codePointAt(index) ?? 65).length ?? 1)
+}
+
 export default {
   check(
     text: string,
@@ -20,17 +24,6 @@ export default {
       foundStart: number,
       foundEnd: number
     ) => {
-      /*console.log(
-        `foundFunction: ${foundStart} `
-        +`${text.substring(foundStart-2, foundStart)}`
-        +`_${text.substring(foundStart, foundEnd+1)}_`
-        +`${text.substring(foundEnd+1, foundEnd+3)}`
-        +` ${foundEnd}`)*/
-
-   function unicodeLength(unicodeText: string, index: number) {
-    return (String.fromCodePoint(unicodeText.codePointAt(index) ?? 65).length ?? 1)
-   }
-
       if (text.substring(foundStart, foundEnd).match(/\s+/)) {
         let nowrapOneStart = foundStart
         let nowrapOneCharStart = foundStart
@@ -67,12 +60,6 @@ export default {
       foundStart: number,
       foundEnd: number
     ) => {
-      /*console.log(
-        `foundFunction: ${foundStart} `
-        +`${text.substring(foundStart-2, foundStart)}`
-        +`_${text.substring(foundStart, foundEnd+1)}_`
-        +`${text.substring(foundEnd+1, foundEnd+3)}`
-        +` ${foundEnd}`)*/
         errorFunctionIn(foundStart, foundEnd)
     }
     let maybeFoundFunction = (
