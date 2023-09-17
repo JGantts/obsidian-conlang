@@ -56,28 +56,11 @@ export default {
           nowrapTwoStart,
           nowrapTwoEnd
         )
-        console.log(nowrapOneStart)
-        console.log(nowrapOneEnd)
-        console.log(text.substring(nowrapOneStart, nowrapOneEnd))
-        console.log(nowrapTwoStart)
-        console.log(nowrapTwoEnd)
-        console.log(text.substring(nowrapTwoStart, nowrapTwoEnd))
-        //console.log(text.substring(foundStart, nowrapOneStart + (text.codePointAt(nowrapOneStart)?.toString().length ?? 1)))
-        //console.log(text.substring(nowrapTwoEnd - (text.codePointAt(nowrapTwoEnd)?.toString().length ?? 1), foundEnd))
-        console.log('---')
       } else {
         foundNowrapFunctionIn(
           foundStart,
           foundEnd
         )
-        /*foundFunctionIn(
-          foundStart,
-          foundEnd
-        )
-        nowrapFunctionIn(
-          foundStart,
-          foundEnd
-        )*/
       }
     }
     let errorFunction = (
