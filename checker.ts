@@ -330,9 +330,9 @@ function buildRegEx(x_string: string, xIsOpen: CheckFor) {
   let sentenceBounaryChars = `\\.|,`
   let hyphensDahses = `-|~`
   if (xIsOpen==CheckFor.Open) {
-    re = new RegExp(`(?<=${whiteSpaceOrStart}|${hyphensDahses})${escaped}(?=${nonWhitespace})`);
+    re = new RegExp(`(?<=${whiteSpaceOrStart}|${hyphensDahses})(?<!\\[)${escaped}(?!\\[)(?=${nonWhitespace})`);
   } else if (xIsOpen==CheckFor.Close) {
-    re = new RegExp(`(?<=${nonWhitespace}|${sentenceBounaryChars})${escaped}(?=${whiteSpaceOrEnd}|${sentenceBounaryChars}|${hyphensDahses})`);
+    re = new RegExp(`(?<=${nonWhitespace}|${sentenceBounaryChars})(?<!\\])${escaped}(?!\\])(?=${whiteSpaceOrEnd}|${sentenceBounaryChars}|${hyphensDahses})`);
   } else { //xIsOpen==CheckFor.Anything
     re = new RegExp(`${escaped}`);
   }
