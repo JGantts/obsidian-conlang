@@ -59,40 +59,18 @@ export default {
         )
       }
     }
-    let errorFunction = (
-      foundStart: number,
-      foundEnd: number
-    ) => {
-        errorFunctionIn(foundStart, foundEnd)
-    }
-    let maybeFoundFunction = (
-      maybeFoundStart: number|null,
-      maybeFoundEnd: number|null
-    ) => {
-      if (maybeFoundStart!=null && maybeFoundEnd!=null) {
-        return
-      } else if (maybeFoundStart!=null) {
-        if (maybeFoundStart==1) {
-          console.log(text)
-          console.log(new Error().stack)
-        }
-        errorFunction(maybeFoundStart!, maybeFoundStart!)
-      } else if (maybeFoundEnd!=null) {
-        errorFunction(maybeFoundEnd!, maybeFoundEnd!)
-      }
-    }
+
+
+    /*
+    * Beign searching
+    */
     let initial_orNull = getNextXAfter_orNull(text, langSettings.open, true, -1)
     let final_orNull = getNextXAfter_orNull(text, langSettings.close, false, initial_orNull)
     let final_orEnd = getNextXAfter_orEnd(text, langSettings.close, false, initial_orNull)
-    //console.log(`${initial_orNull} ${final_orNull}`)
-    //maybeFoundFunction(initial_orNull, final_orNull)
     while (initial_orNull != null) {
       const nextInitial_orNull = getNextXAfter_orNull(text, langSettings.open, true, initial_orNull!)
-      const nextInitial_orEnd = getNextXAfter_orEnd(text, langSettings.open, true, initial_orNull!)
       const nextInitialFound = nextInitial_orNull!=null
-      const nextLinebreak_orNull = getNextXAfter_orNull(text, linebreak, null, initial_orNull!)
       const nextLinebreak_orEnd = getNextXAfter_orEnd(text, linebreak, null, initial_orNull!)
-      const nextLinebreakFound = nextLinebreak_orNull!=null
       const finalFound = () => final_orNull!=null
       const doubleInitial = 
         langSettings.open != langSettings.close
@@ -104,7 +82,6 @@ export default {
           || nextInitial_orNull! < final_orNull!
         )
       if (doubleInitial) {
-        errorFunction(initial_orNull!, initial_orNull!)
         initial_orNull = nextInitial_orNull!
         final_orNull = getNextXAfter_orNull(text, langSettings.close, false, initial_orNull)
         final_orEnd = getNextXAfter_orEnd(text, langSettings.close, false, initial_orNull)
@@ -130,18 +107,13 @@ export default {
           langSettings,
           linebreak,
           initial_orNull!,
-          foundFunction,
-          errorFunction
+          foundFunction
         )
       } else if (initial_orNull!=null && final_orNull!=null && !isBroken) {
         foundFunction(
           initial_orNull!,
           final_orNull
         )
-      } else if (isBroken) {
-        errorFunction(initial_orNull, initial_orNull)
-      } else {
-        maybeFoundFunction(initial_orNull, final_orNull)
       }
 
       if (langSettings.open == langSettings.close) {
@@ -152,7 +124,6 @@ export default {
       final_orNull = getNextXAfter_orNull(text, langSettings.close, false, initial_orNull)
       final_orEnd = getNextXAfter_orEnd(text, langSettings.close, false, initial_orNull)
     }
-    maybeFoundFunction(initial_orNull, final_orNull)
   }
 }
 
@@ -164,10 +135,6 @@ function openEnded(
   foundFunction: (
     openFirstChar: number,
     closeLastChar: number
-  ) => void,
-  errorFunction: (
-    foundStart: number,
-    foundEnd: number
   ) => void
 ) {
   const nextLinebreak_orEnd = getNextXAfter_orEnd(text, linebreak, null, initial)
@@ -276,8 +243,6 @@ function openEnded(
       initial,
       nextLinebreak_orEnd
     )
-  } else {
-    errorFunction(initial, initial)
   }
 }
 
@@ -286,21 +251,14 @@ function getNextXAfter_orNull(
   x_string: string,
   xIsOpen: boolean|null,
   after: number|null
-) {
-  if (after == null) {
-    return null
-  }
-  const re = buildRegEx(x_string, xIsOpen)
-  let searchStart = after+1
-  let substring = 
-    text.substring(searchStart)
-  let nextAfter = substring.search(re)
-  let toReturn = (
-    nextAfter == -1
-      ? null
-      : nextAfter + searchStart
-  );
-  return toReturn
+): number|null {
+  return getNextXAfter_orY(
+    text,
+    x_string,
+    null,
+    xIsOpen,
+    after
+  )
 }
 
 function getNextXAfter_orEnd(
@@ -309,18 +267,36 @@ function getNextXAfter_orEnd(
   xIsOpen: boolean|null,
   after: number|null
 ): number {
+  return getNextXAfter_orY(
+    text,
+    x_string,
+    text.length-1,
+    xIsOpen,
+    after
+  ) as number
+}
+
+function getNextXAfter_orY(
+  text: string,
+  x_string: string,
+  y_value: number|null,
+  xIsOpen: boolean|null,
+  after: number|null
+): number|null {
   if (after == null) {
-    return text.length-1
+    return y_value
   }
   const re = buildRegEx(x_string, xIsOpen)
   let searchStart = after+1
+
   let nextAfter = 
     text.substring(searchStart).search(re)
-  return (
+  let toReturn = (
     nextAfter == -1
-      ? text.length-1
+      ? y_value
       : nextAfter + searchStart
-  );
+  )
+  return toReturn
 }
 
 function existsXInBewtween(
